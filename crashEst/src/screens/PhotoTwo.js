@@ -1,42 +1,96 @@
-import React, { useState, useEffect } from 'react';
-import { Text, View, TouchableOpacity ,StyleSheet} from 'react-native';
-import { Camera } from 'expo-camera';
-import { FontAwesome, Ionicons,MaterialCommunityIcons } from '@expo/vector-icons';
+import React, {PureComponent, useState} from 'react';
+import {RNCamera} from 'react-native-camera';
+import {TouchableOpacity, StyleSheet,View,Text} from 'react-native';
+import FontAwesome, { SolidIcons, RegularIcons, BrandIcons } from 'react-native-fontawesome';
+export default class PhotoTwo extends PureComponent {  
+    
+    constructor(props,navigation) 
+    {
+        super(props);
+        this.navigation = navigation;
+        this.state = 
+        {
+            takingPic: false,
+            photoCount:0,
+            cameraRoll:[],
+        };
 
-export default function PhotoTwo({navigation}) {
-    const [photoCount, setPhotoCount] = useState(0);
+    }
+    
+
+      render() {
+        return (
+          <View style={styles.container}>
+            <RNCamera
+              ref={ref => {
+                this.camera = ref;
+              }}
+              style={styles.preview}
+              type={RNCamera.Constants.Type.back}
+              flashMode={RNCamera.Constants.FlashMode.on}
+              androidCameraPermissionOptions={{
+                title: 'Permission to use camera',
+                message: 'We need your permission to use your camera',
+                buttonPositive: 'Ok',
+                buttonNegative: 'Cancel',
+              }}
+            >
+            <View style={styles.textContainer}>
+                <Text style={styles.text}>{this.state.photoCount}/5</Text>
+            </View>
+            <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
+                {(this.state.takingPic) ?
+                <Text style={styles.saving}> Saving please wait </Text> :
+                <TouchableOpacity onPress={() => this.takePicture(this.camera)} style={styles.capture}>
+                <FontAwesome style={styles.plus} icon={SolidIcons.camera} />
+                </TouchableOpacity>
+                }
+                
+            </View>
+            </RNCamera>
+          </View>
+        );
+      }
+    
+      takePicture = async function(camera) {
+        const options = { quality: 0.5, base64: true };
+        const data = await camera.takePictureAsync(options);
+        this.setState({ photoCount: this.state.photoCount + 1 })
+        this.state.cameraRoll.push(data.uri)
+        if(this.state.photoCount >= 5)
+        {
+            this.props.navigation.navigate('PhotoDetailsScreen',{imageArray:this.state.cameraRoll});
+        }
+      };
+    }
+    
     const styles = StyleSheet.create({
-        textStyle: {
-          fontSize: 30,
-          color:'white'
-        },
-        layout:{
-            paddingTop:50
-        },
-        button: {
-            alignItems: "center",
-            backgroundColor: "#FF9933",
-            padding: 10,
-            margin:25,
-            borderRadius:10,
-            borderWidth:3,
-            borderColor:'white'
-          },
-        slection:{
-          borderRadius:40,
-          width:200,
-          height:200,
-          borderColor:'#FF9933',
-          borderWidth:2
+      container: {
+        flex: 1,
+        flexDirection: 'column',
+        backgroundColor: 'black',
+      },
+      preview: {
+        flex: 1,
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+      },
+      capture: {
+        flex: 0,
+        backgroundColor: 'rgba(52, 52, 52, 0)',
+        borderRadius: 5,
+        padding: 15,
+        paddingHorizontal: 20,
+        alignSelf: 'center',
+        margin: 20,
       },
       plus:{
-         color: "#FF9933",
-          fontSize: 100,
-          alignSelf:'center',
-          paddingTop:50
-          
+        color: "#FF9933",
+        fontSize: 100,
+        alignSelf:'center',
+        paddingTop:40
       },
-      text:{
+       text:{
         color:'#FF9933',
         fontSize:40,
         justifyContent:"center",
@@ -46,97 +100,5 @@ export default function PhotoTwo({navigation}) {
         flexDirection:'row',
         justifyContent:'center',
         paddingTop:30
-    }
-      });
-
-    const [hasPermission, setHasPermission] = useState(null);
-  const [cameraRef, setCameraRef] = useState(null);
-  const [cameraRoll, setCameraRoll] = useState([]);
-  const [type, setType] = useState(Camera.Constants.Type.back);useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
-  }, []);if (hasPermission === null) {
-    return <View />;
-  }
-  if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
-  }
-  return (
-    <View style={{ flex: 1 }}>
-      <Camera style={{ flex: 1 }} type={type} ref={ref => {setCameraRef(ref);}}>
-          <View style={styles.textContainer}>
-            <Text style={styles.text}>{photoCount}/5</Text>
-          </View>
-      
-        <View
-          style={{flex:1, flexDirection:"row",justifyContent:"space-between",margin:20}}>
-              
-            <TouchableOpacity
-                style={{
-                        alignSelf: 'flex-end',
-                        alignItems: 'center',
-                        backgroundColor: 'transparent',                  
-                    }}>
-                <Ionicons
-                name="ios-photos"
-                style={{ color: "#FF9933", fontSize: 40}}
-                />
-            </TouchableOpacity>
-
-            <TouchableOpacity style={{
-                    alignSelf: 'flex-end',
-                    alignItems: 'center',
-                    backgroundColor: 'transparent',
-                }}
-                    onPress={async() => {
-                    if(cameraRef){
-                        let photo = await cameraRef.takePictureAsync();
-                        //console.log('photo', photo);
-                        let n = photoCount;
-                        n++;
-                        
-                        setPhotoCount(n);
-                        let arryRoll = cameraRoll;
-                        arryRoll.push(photo)
-                        setCameraRoll(arryRoll);
-                        if(n > 4){
-                            navigation.navigate('PhotoDetails',{imageArray:arryRoll});
-                        }
-                    }
-                }}
-            >
-            <FontAwesome
-                name="camera"
-                style={{ color: "#FF9933", fontSize: 60}}
-            />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-            style={{
-                alignSelf: 'flex-end',
-                alignItems: 'center',
-                backgroundColor: 'transparent',
-              }}
-            onPress={() => {
-              setType(
-                type === Camera.Constants.Type.back
-                  ? Camera.Constants.Type.front
-                  : Camera.Constants.Type.back
-              );
-            }}>
-            <MaterialCommunityIcons name="camera-switch"
-                style={{ color: "#FF9933", fontSize: 40}}
-            />
-          </TouchableOpacity>
-          
-        </View>
-      </Camera>
-    </View>
-  );
-
-
-
-}
-
+    },
+    });

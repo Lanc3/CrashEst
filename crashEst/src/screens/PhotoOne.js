@@ -1,19 +1,16 @@
 import React , { Component, useEffect } from 'react';
 import { TextInput , StyleSheet, View, Button, TouchableHighlight, Text} from "react-native";
 import CameraButton from "../components/cameraButton"
-import { validate } from 'validate.js';
-import constraints from '../comstraints/constraints';
 
 export default class PhotoOne extends Component {
 
-    constructor({props,navigation}) {
+    constructor({route,props,navigation}) {
       super(props);
       this.state = { data: { Manufacturer: "" ,selectedYear:'',Model:''} };
       this._onPressButton = this._onPressButton.bind(this);
       this.navigation = navigation;
       this._storeData = this._storeData.bind(this);
-      this.data = navigation.state.params.FormData;
-      
+      this.data = route.params.FormData; 
     }
   
      _storeData(){
@@ -30,14 +27,7 @@ export default class PhotoOne extends Component {
     }
   
     _onPressButton() {
-      const validationResult = validate(this.state.data, constraints);
-      // validationResult is undefined if there are no errors
-      if(validationResult === null || validationResult === undefined)
-      {
-          this._storeData();
-          this.navigation.navigate('StartA',{FormData:this.state.data});
-      }
-      this.setState({ errors: validationResult });
+
     }
   
     
@@ -58,27 +48,7 @@ export default class PhotoOne extends Component {
         </View>
         );
     }
-  
-    getErrorMessages(separator="\n") {
-      const { errors } = this.state;
-      if (!errors) return [];
-  
-      return Object.values(errors).map(it => it.join(separator)).join(separator);
-    }
-  
-    getErrorsInField(field) {
-      const { errors } = this.state;
-      return errors && errors[field] || [];
-    }
-  
-    isFieldInError(field) {
-      const { errors } = this.state;
-      return errors && !!errors[field];
-    }
   }
-  
-
-
 
 const styles = StyleSheet.create({
   background:{

@@ -31,8 +31,8 @@ const VehicleType = ({sourceImage,navi}) => {
     }
 
     const onPress = () =>{
-        console.log(type)
-        navi.navigate('PickArea',{VehicleData:type});
+        
+        navi.navigate('PickAreaScreen',{VehicleData:type});
     };
 
     return <View style={styles.layout}>

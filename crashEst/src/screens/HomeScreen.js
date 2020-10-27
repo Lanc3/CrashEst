@@ -1,9 +1,8 @@
 import React , { useState, useEffect } from 'react';
-import { AsyncStorage , StyleSheet, View, Button, TouchableOpacity} from "react-native";
-import ImageDetail from "../components/ImageDetail"
-import ButtonStyle from "../components/ButtonStyle"
-
-
+import {StyleSheet, View, Button, Text} from "react-native";
+import AsyncStorage from '@react-native-community/async-storage';
+import ImageDetail from "../components/ImageDetail";
+import ButtonStyle from "../components/ButtonStyle";
 
 const HomeScreen = ({navigation}) => {
 
@@ -13,8 +12,7 @@ const HomeScreen = ({navigation}) => {
             const value = await AsyncStorage.getItem('SignUpDetails')
             if (value !== null) {
                 // We have data!!
-                console.log(value)
-                navigation.navigate('StartA')
+                navigation.navigate('StartAScreen')
               }
               else{
                
@@ -29,9 +27,8 @@ const HomeScreen = ({navigation}) => {
 
      
   return <View style={styles.background}>
-      
       <ImageDetail imageSource={require('../../assets/logo.png')}/>
-      <ButtonStyle onClick={'SignUp'} navi={navigation} text={'Welcome'}/>
+      <ButtonStyle onClick={'SignUpScreen'} navi={navigation} text={'Welcome'}/>
   </View>
   
 };

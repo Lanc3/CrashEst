@@ -1,5 +1,5 @@
 import React , { useState, useEffect } from 'react';
-import { AsyncStorage , StyleSheet, View, Button, TouchableOpacity, Text} from "react-native";
+import { StyleSheet, View, Button, TouchableOpacity, Text} from "react-native";
 import VehicleType from "../components/vehicleType"
 
 const ClaimStart = ({navigation}) => {

@@ -1,18 +1,19 @@
-import React , { Component, useEffect } from 'react';
+import React , { Component, Fragment, useEffect } from 'react';
 import { TextInput , StyleSheet, View, Button, TouchableHighlight, Text} from "react-native";
 import ButtonStyle from "../components/ButtonStyle"
-import { validate } from 'validate.js';
+import * as yup from 'yup'
+import { Formik } from 'formik'
 import constraints from '../comstraints/modelConstraints';
 
 export default class PickArea extends Component {
 
-    constructor({props,navigation}) {
+    constructor({route,props,navigation}) {
       super(props);
       this.state = { data: { Manufacturer: "" ,selectedYear:'',Model:''} };
       this._onPressButton = this._onPressButton.bind(this);
       this.navigation = navigation;
       this._storeData = this._storeData.bind(this);
-      this.type = navigation.state.params.VehicleData;
+      this.type = route.params.VehicleData;
     }
   
      _storeData(){
@@ -28,101 +29,83 @@ export default class PickArea extends Component {
       }
     }
   
-    _onPressButton() {
-      const validationResult = validate(this.state.data, constraints);
-      // validationResult is undefined if there are no errors
-      if(validationResult === null || validationResult === undefined)
-      {
-          //this._storeData();
-          this.navigation.navigate('PhotoOne',{FormData:this.state.data});
-      }
-      this.setState({ errors: validationResult });
-     // console.log({ errors: validationResult })
+    _onPressButton(values) {
+        console.log(values)
+        this.props.navigation.navigate("PhotoOneScreen", {FormData:values})
     }
   
     
     render() {
         return (
-        <View style={styles.background}>
-            <View style={styles.textContainer}>
-                <Text style={styles.text}>Step 2 of 6</Text>
-            </View>
-        <View style={styles.textContainer}>
-            <Text style = {styles.smallText}>You Selected: {JSON.stringify(this.type)}</Text>
-        </View>
-
-        <View style={styles.container}>
+        <Formik
+        initialValues={{ year: '', manufacturer: '', model:''}}
+        onSubmit={values => this._onPressButton(values)}
+        validationSchema={yup.object().shape(
+            {
+            year: yup
+            .number()
+            .required()
+            .min(1970),
+            manufacturer: yup
+            .string()
+            .required(),
+            model : yup
+            .string()
+            .required(),
+        })}
+       
+      >
+          
+        {({ values, handleChange, errors, setFieldTouched, touched, isValid, handleSubmit }) => (
+            <Fragment >
+                <View style={styles.textContainer}>
+                    <Text style={styles.text}>Step 2 of 6</Text>
+                </View>
+                <View style={styles.textContainer}>
+                    <Text style = {styles.smallText}>You Selected: {JSON.stringify(this.type)}</Text>
+                </View>
+            <View style={styles.background}>
             <TextInput
-                style={styles.yearInput}
-                placeholder={'year'}
-                onChangeText={(yearOfCar) => (
-                    this.setState({
-                      ...this.state,
-                      data: {
-                        ...this.state.data,
-                        selectedYear: yearOfCar
-                      }
-                    })
-                )}
-                value={this.state.data.selectedYear}
+              style={styles.yearInput}
+              value={values.year}
+              onChangeText={handleChange('year')}
+              onBlur={() => setFieldTouched('year')}
+              placeholder="1970"
             />
+            {touched.year && errors.year &&
+              <Text style={styles.errorText}>{errors.year}</Text>
+            }
             <TextInput
-                style={styles.textInput}
-                placeholder={'Manufacturer'}
-                onChangeText={(manufac) => (
-                    this.setState({
-                      ...this.state,
-                      data: {
-                        ...this.state.data,
-                        Manufacturer: manufac
-                      }
-                    })
-                )}
-                value={this.state.data.Manufacturer}
+              style={styles.textInput}
+              value={values.manufacturer}
+              onChangeText={handleChange('manufacturer')}
+              placeholder="manufacturer"
+              onBlur={() => setFieldTouched('manufacturer')}
+              secureTextEntry={false}
             />
-        </View>
-    
-        <TextInput
-            style={styles.modelInput}
-            placeholder={'Model'}
-            onChangeText={(modelNumber) => (
-                this.setState({
-                  ...this.state,
-                  data: {
-                    ...this.state.data,
-                    Model: modelNumber
-                  }
-                })
-            )}
-            value={this.state.data.Model}
-        />
-  
-            <TouchableHighlight style={styles.button} onPress={this._onPressButton}>
+            {touched.manufacturer && errors.manufacturer &&
+              <Text style={styles.errorText}>{errors.manufacturer}</Text>
+            }
+            <TextInput
+              style={styles.modelInput}
+              value={values.model}
+              onChangeText={handleChange('model')}
+              placeholder="model"
+              onBlur={() => setFieldTouched('model')}
+              secureTextEntry={false}
+            />
+            {touched.model && errors.model &&
+              <Text style={styles.errorText}>{errors.model}</Text>
+            }
+            
+            <TouchableHighlight style={styles.button} onPress={handleSubmit}>
               <Text>Submit</Text>
             </TouchableHighlight>
-  
-            {this.isFieldInError('Model') && this.getErrorsInField('Model').map(errorMessage => <Text key={errorMessage} style={styles.errorText}>{errorMessage}</Text>)}
-            {this.isFieldInError('Manufacturer') && this.getErrorsInField('Manufacturer').map(errorMessage => <Text key={errorMessage} style={styles.errorText}>{errorMessage}</Text>)}
-            {this.isFieldInError('selectedYear') && this.getErrorsInField('selectedYear').map(errorMessage => <Text key={errorMessage} style={styles.errorText}>{errorMessage}</Text>)}
-        </View>
+            </View>
+          </Fragment>
+        )}
+      </Formik>
         );
-    }
-  
-    getErrorMessages(separator="\n") {
-      const { errors } = this.state;
-      if (!errors) return [];
-  
-      return Object.values(errors).map(it => it.join(separator)).join(separator);
-    }
-  
-    getErrorsInField(field) {
-      const { errors } = this.state;
-      return errors && errors[field] || [];
-    }
-  
-    isFieldInError(field) {
-      const { errors } = this.state;
-      return errors && !!errors[field];
     }
   }
   
@@ -148,6 +131,7 @@ const styles = StyleSheet.create({
     paddingLeft:0
   },
   textContainer:{
+    backgroundColor:'#3A3A3A',
       flexDirection:'row',
       justifyContent:'center'
   },
@@ -159,8 +143,7 @@ const styles = StyleSheet.create({
     backgroundColor:'white',
     borderRadius:10,
     justifyContent:'center',
-    flexDirection:'row',
-    flex:3
+    flexDirection:'row'
   },
 smallText:{
     color:'#FF9933'
@@ -173,8 +156,7 @@ yearInput:{
     backgroundColor:'white',
     borderRadius:10,
     justifyContent:'center',
-    flexDirection:'row',
-    flex:1
+    flexDirection:'row'
 },
 modelInput:{
     height: 40,
@@ -206,7 +188,7 @@ container:{
         },
         errorText:{
             color:'#FF9933',
-            fontSize:20,
+            fontSize:14,
             fontWeight:'bold',
          
             flexDirection:'row',

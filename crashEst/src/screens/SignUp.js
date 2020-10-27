@@ -1,106 +1,87 @@
-import React, { Component,useState } from 'react';
-import { AsyncStorage,Text, View, TextInput, StyleSheet, TouchableHighlight } from 'react-native';
-import { validate } from 'validate.js';
+import * as yup from 'yup'
+import { Formik } from 'formik'
+import AsyncStorage from '@react-native-community/async-storage';
+import React, { Component, Fragment } from 'react';
+import { TextInput, Text, Button, TouchableHighlight, StyleSheet, View} from 'react-native';
 
-import constraints from '../comstraints/constraints';
-const BLUE = "#428AF8";
-const LIGHT_GRAY = "#D3D3D3";
-export default class SignUp extends Component {
 
-  constructor({props,navigation}) {
-    super(props);
-    this.state = { data: { emailAddress: "" ,userName:''} };
-    this._onPressButton = this._onPressButton.bind(this);
-    this.navigation = navigation;
-    this._storeData = this._storeData.bind(this);
-  }
-
-   _storeData(){
-    try {
-       AsyncStorage.setItem(
-        'SignUpDetails',
-        JSON.stringify({email:this.state.data.emailAddress,name:this.state.data.userName})
-      );
-  
-    } catch (error) {
-      // Error saving data
-      console.log("error")
+export default class App extends Component {
+    constructor({props,navigation}){
+        super(props);
+        this.navigation = navigation;
+        this._onPressButton = this._onPressButton.bind(this);
+        this._storeData = this._storeData.bind(this);
     }
-  }
 
-  _onPressButton() {
-    const validationResult = validate(this.state.data, constraints);
-    // validationResult is undefined if there are no errors
-    console.log(validationResult)
-    if(validationResult === null || validationResult === undefined)
-    {
-        this._storeData();
-        this.navigation.navigate('StartA');
-    }
-    this.setState({ errors: validationResult });
-  }
+    _onPressButton(values) {
+        this._storeData(values);
+       this.props.navigation.navigate("StartAScreen")
+    };
 
-  
+    _storeData(values){
+        try {
+            console.log("saved")
+           AsyncStorage.setItem(
+            'SignUpDetails',
+            JSON.stringify({email:values.email,name:values.name})
+          );
+      
+        } catch (error) {
+          // Error saving data
+          console.log("error")
+        }
+      };
+
   render() {
-      return (
-        <View style={styles.background}>
-           <Text style={styles.title}>Email</Text>
-          <TextInput
-            style={styles.textInput}
-            onChangeText={(email) => (
-              this.setState({
-                ...this.state,
-                data: {
-                  ...this.state.data,
-                  emailAddress: email
-                }
-              })
-            )}
-            placeholder={'example@gmail.com'}
-            value={this.state.data.emailAddress}
-          />
-           <Text style={styles.title}>Name</Text>
-          <TextInput
-            style={styles.textInput}
-            onChangeText={(name) => (
-              this.setState({
-                ...this.state,
-                data: {
-                  ...this.state.data,
-                  userName: name
-                }
-              })
-            )}
-            placeholder={'name'}
-            value={this.state.data.userName}
-          />
-
-          <TouchableHighlight style={styles.button} onPress={this._onPressButton}>
-            <Text>Submit</Text>
-          </TouchableHighlight>
-
-          {this.isFieldInError('emailAddress') && this.getErrorsInField('emailAddress').map(errorMessage => <Text key={errorMessage} style={styles.errorText}>{errorMessage}</Text>)}
-          {this.isFieldInError('userName') && this.getErrorsInField('userName').map(errorMessage => <Text key={errorMessage} style={styles.errorText}>{errorMessage}</Text>)}
-          
-        </View>
-      );
-  }
-
-  getErrorMessages(separator="\n") {
-    const { errors } = this.state;
-    if (!errors) return [];
-
-    return Object.values(errors).map(it => it.join(separator)).join(separator);
-  }
-
-  getErrorsInField(field) {
-    const { errors } = this.state;
-    return errors && errors[field] || [];
-  }
-
-  isFieldInError(field) {
-    const { errors } = this.state;
-    return errors && !!errors[field];
+    return (
+      <Formik
+        initialValues={{ email: '', name: '' }}
+        onSubmit={values => this._onPressButton(values)}
+        validationSchema={yup.object().shape({
+          email: yup
+            .string()
+            .email()
+            .required(),
+            name: yup
+            .string()
+            .min(6)
+            .required(),
+        })}
+       
+      >
+        {({ values, handleChange, errors, setFieldTouched, touched, isValid, handleSubmit }) => (
+          <Fragment >
+              <View style={styles.background}>
+            <TextInput
+              style={styles.textInput}
+              value={values.email}
+              onChangeText={handleChange('email')}
+              onBlur={() => setFieldTouched('email')}
+              placeholder="E-mail"
+            />
+            {touched.email && errors.email &&
+              <Text style={styles.errorText}>{errors.email}</Text>
+            }
+            <TextInput
+              style={styles.textInput}
+              value={values.name}
+              onChangeText={handleChange('name')}
+              placeholder="Name"
+              onBlur={() => setFieldTouched('name')}
+              secureTextEntry={false}
+            />
+            {touched.name && errors.name &&
+              <Text style={styles.errorText}>{errors.name}</Text>
+            }
+            
+            <TouchableHighlight style={styles.button} onPress={handleSubmit}>
+              <Text>Submit</Text>
+            </TouchableHighlight>
+            </View>
+          </Fragment>
+        )}
+      </Formik>
+    );
   }
 }
 
@@ -159,12 +140,12 @@ const styles = StyleSheet.create({
             fontWeight:'bold'
         },
         errorText:{
-            color:'#FF9933',
-            fontSize:20,
+            color:'red',
+            fontSize:12,
             fontWeight:'bold',
-         
+            marginLeft:15,
             flexDirection:'row',
-            alignSelf:'center',
+            alignSelf:'flex-start',
             justifyContent:'center'
         }
 });

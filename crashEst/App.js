@@ -1,42 +1,38 @@
-import { createAppContainer } from 'react-navigation';
-import { createStackNavigator } from 'react-navigation-stack';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import * as React from 'react';
+import HomeScreen from './src/screens/HomeScreen';
 import StartAScreen from "./src/screens/StartA";
-import StartBScreen from './src/screens/StartB';
 import SignUpScreen from './src/screens/SignUp';
-import SuccessPaymentScreen from './src/screens/SuccessPayment';
+import ClaimStartScreen from './src/screens/ClaimStart';
 import PickAreaScreen from './src/screens/PickArea';
 import PhotoOneScreen from './src/screens/PhotoOne';
 import PhotoTwoScreen from './src/screens/PhotoTwo';
-import PaymentScreen from './src/screens/PaymentScreen';
-import HomeScreen from './src/screens/HomeScreen';
-import FailedPaymentScreen from './src/screens/FailedPayment';
-import ClaimStartScreen from './src/screens/ClaimStart';
-import ClaimantDetailsScreen from './src/screens/ClaimantDetails';
 import PhotoDetailsScreen from './src/screens/PhotoDetails';
+import ClaimantDetailsScreen from './src/screens/ClaimantDetails';
 
-const navigator = createStackNavigator(
-  {
-    Home: HomeScreen,
-    StartA: StartAScreen,
-    StartB: StartBScreen,
-    SignUp: SignUpScreen,
-    SuccessPayment: SuccessPaymentScreen,
-    PickArea : PickAreaScreen,
-    PhotoOne: PhotoOneScreen,
-    PhotoTwo: PhotoTwoScreen,
-    Payment : PaymentScreen,
-    FailedPayment: FailedPaymentScreen,
-    ClaimStart : ClaimStartScreen,
-    ClaimantDetails : ClaimantDetailsScreen,
-    PhotoDetails : PhotoDetailsScreen
-  },
-  {
-    initialRouteName: "Home",
-    defaultNavigationOptions: {
-      title: "",
-      headerShown: false
-    }
-  }
-);
+const Stack = createStackNavigator();
 
-export default createAppContainer(navigator);
+function MyStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="Home" component={HomeScreen} options={{headerShown: false}} />
+      <Stack.Screen name="StartAScreen" component={StartAScreen} options={{headerShown: false}} />
+      <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{headerShown: false}} />
+      <Stack.Screen name="ClaimStartScreen" component={ClaimStartScreen} options={{headerShown: false}} />
+      <Stack.Screen name="PickAreaScreen" component={PickAreaScreen} options={{headerShown: false}} />
+      <Stack.Screen name="PhotoOneScreen" component={PhotoOneScreen} options={{headerShown: false}} />
+      <Stack.Screen name="PhotoTwoScreen" component={PhotoTwoScreen} options={{headerShown: false}} />
+      <Stack.Screen name="PhotoDetailsScreen" component={PhotoDetailsScreen} options={{headerShown: false}} />
+      <Stack.Screen name="ClaimantDetailsScreen" component={ClaimantDetailsScreen} options={{headerShown: false}} />
+    </Stack.Navigator>
+  );
+}
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <MyStack />
+    </NavigationContainer>
+  );
+}

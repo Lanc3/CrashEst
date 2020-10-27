@@ -1,6 +1,6 @@
 import React ,{Component}from 'react';
 import {View ,Text, TextInput,StyleSheet,TouchableHighlight,ScrollView} from'react-native';
-import { validate } from 'validate.js';
+import { validate } from 'validate-js';
 
 import constraints from '../comstraints/paymentConstraints';
 

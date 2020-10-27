@@ -22,7 +22,7 @@ const ButtonStyle = ({text,navi,onClick}) => {
 const styles = StyleSheet.create({
     textStyle: {
       fontSize: 30,
-      color:'white'
+      color:'black'
     },
     layout:{
         paddingTop:100

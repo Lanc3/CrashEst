@@ -1,17 +1,16 @@
 import React , { useState, useEffect } from 'react';
 import { AsyncStorage , StyleSheet, View, Button, TouchableOpacity} from "react-native";
 import ImageDetail from "../components/ImageDetail"
-import ButtonStyle from "../components/ButtonStyle"
+import ButtonStyle from "../components/ButtonStyle";
 
-
-
+ 
 const StartA = ({navigation}) => {
-
+    //console.log(RNSmtpMailer)
      
   return <View style={styles.background}>
       
       <ImageDetail imageSource={require('../../assets/logo.png')}/>
-      <ButtonStyle onClick={'ClaimStart'} navi={navigation} text={'Get Estimate'}/>
+      <ButtonStyle onClick={'ClaimantDetailsScreen'} navi={navigation} text={'Get Estimate'}/>
   </View>
   
 };

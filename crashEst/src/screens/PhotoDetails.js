@@ -2,11 +2,12 @@ import React , { useState, useEffect } from 'react';
 import { FlatList , StyleSheet, View, Image, TouchableOpacity, Text} from "react-native";
 import VehicleType from "../components/vehicleType"
 
-const PhotoDetails = ({navigation}) => {
+const PhotoDetails = ({route,navigation}) => {
     const onPress = (dest) =>{
         navigation.navigate(dest);
     };
-     const photos = navigation.state.params.imageArray;
+     const photos = route.params.imageArray;
+     console.log(photos)
 
   return <View style={styles.background}>
       <View style={styles.header}>
@@ -25,10 +26,10 @@ const PhotoDetails = ({navigation}) => {
       <FlatList 
                 vertical
                 data={photos}
-                keyExtractor={(photos) => photos.uri.toString()}
+                keyExtractor={(photos) => photos.toString()}
                 renderItem={({item}) => (
                     <View style={styles.photoContainer}>
-                        <Image style={styles.flairImage} source={{uri:item.uri}}></Image>
+                        <Image style={styles.flairImage} source={{uri:item}}></Image>
                     </View>
                     
                 )}
@@ -44,7 +45,7 @@ const PhotoDetails = ({navigation}) => {
         </TouchableOpacity>
         <TouchableOpacity
             style={styles.button}
-            onPress={ () => onPress('ClaimantDetails',{photoArray:photos})}
+            onPress={ () => onPress('ClaimantDetailsScreen',{photoArray:photos})}
         >
             <Text style={styles.textStyle} >Continue</Text>
         </TouchableOpacity>
@@ -62,7 +63,7 @@ const styles = StyleSheet.create({
     justifyContent:"center"
   },
   flairImage: {
-    width:200,
+    width:'90%',
     height:200,
     margin:5,
     alignSelf:'center',
